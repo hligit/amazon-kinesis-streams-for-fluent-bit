@@ -17,6 +17,7 @@ If you think you’ve found a potential security issue, please do not post it in
 * `append_newline`: If you set append_newline as true, a newline will be addded after each log record.
 * `time_key`: Add the timestamp to the record under this key. By default the timestamp from Fluent Bit will not be added to records sent to Kinesis.
 * `time_key_format`: [strftime](http://man7.org/linux/man-pages/man3/strftime.3.html) compliant format string for the timestamp; for example, `%Y-%m-%dT%H:%M:%S%z`. This option is used with `time_key`. 
+* `log_level`: Set the log level for the plugin. Valid values are: `debug`, `info`, and `error` (case insensitive). Default is `info`. 
 
 ### Permissions
 
@@ -28,7 +29,6 @@ This plugin uses the AWS SDK Go, and uses its [default credential provider chain
 
 ### Environment Variables
 
-* `FLB_LOG_LEVEL`: Set the log level for the plugin. Valid values are: `debug`, `info`, and `error` (case insensitive). Default is `info`. **Note**: Setting log level in the Fluent Bit Configuration file using the Service key will not affect the plugin log level (because the plugin is external).
 * `SEND_FAILURE_TIMEOUT`: Allows you to configure a timeout if the plugin can not send logs to Kinesis Streams. The timeout is specified as a [Golang duration](https://golang.org/pkg/time/#ParseDuration), for example: `5m30s`. If the plugin has failed to make any progress for the given period of time, then it will exit and kill Fluent Bit. This is useful in scenarios where you want your logging solution to fail fast if it has been misconfigured (i.e. network or credentials have not been set up to allow it to send to Kinesis Streams).
 
 ### Fluent Bit Versions
@@ -46,6 +46,7 @@ This plugin has been tested with Fluent Bit 1.2.0+. It may not work with older F
 [OUTPUT]
     Name            kinesis
     Match           *
+    Log_Level       debug
     region          us-west-2
     stream          my-kinesis-stream-name
     partition_key   container_id

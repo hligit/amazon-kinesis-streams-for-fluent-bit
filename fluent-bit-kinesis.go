@@ -96,7 +96,7 @@ func FLBPluginRegister(ctx unsafe.Pointer) int {
 
 //export FLBPluginInit
 func FLBPluginInit(ctx unsafe.Pointer) int {
-	plugins.SetupLogger()
+	plugins.SetupLogger(output.FLBPluginConfigKey(ctx, "log_level"))
 	err := addPluginInstance(ctx)
 	if err != nil {
 		logrus.Errorf("[kinesis] Failed to initialize plugin: %v\n", err)
