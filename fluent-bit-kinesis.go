@@ -33,6 +33,11 @@ var (
 func addPluginInstance(ctx unsafe.Pointer) error {
 	pluginID := len(pluginInstances)
 	output.FLBPluginSetContext(ctx, pluginID)
+
+	level := output.FLBPluginConfigKey(ctx, "log_level")
+	fmt.Printf("after FLBPluginSetContext Log level is %s\n", level)
+	plugins.SetupLogger(level)
+
 	instance, err := newKinesisOutput(ctx, pluginID)
 	if err != nil {
 		return err
@@ -66,6 +71,8 @@ func newKinesisOutput(ctx unsafe.Pointer, pluginID int) (*kinesis.OutputPlugin, 
 	logrus.Infof("[firehose %d] plugin parameter time_key = '%s'\n", pluginID, timeKey)
 	timeKeyFmt := output.FLBPluginConfigKey(ctx, "time_key_format")
 	logrus.Infof("[firehose %d] plugin parameter time_key_format = '%s'\n", pluginID, timeKeyFmt)
+	level := output.FLBPluginConfigKey(ctx, "log_level")
+	logrus.Infof("[kinesis %d] plugin parameter log_level = '%s'", pluginID, level)
 
 	if stream == "" || region == "" {
 		return nil, fmt.Errorf("[kinesis %d] stream and region are required configuration parameters", pluginID)
@@ -96,7 +103,9 @@ func FLBPluginRegister(ctx unsafe.Pointer) int {
 
 //export FLBPluginInit
 func FLBPluginInit(ctx unsafe.Pointer) int {
-	plugins.SetupLogger(output.FLBPluginConfigKey(ctx, "log_level"))
+	level := output.FLBPluginConfigKey(ctx, "log_level")
+	fmt.Printf("Log level is %s\n", level)
+	plugins.SetupLogger(level)
 	err := addPluginInstance(ctx)
 	if err != nil {
 		logrus.Errorf("[kinesis] Failed to initialize plugin: %v\n", err)
